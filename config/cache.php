@@ -131,6 +131,11 @@ return [
     |
     */
 
-    'serializable_classes' => false,
+    'serializable_classes' => [
+        Illuminate\Database\Eloquent\Collection::class,
+        App\Models\Quote::class,
+        App\Models\Author::class,
+        App\Models\Category::class,
+    ],
 
 ];
