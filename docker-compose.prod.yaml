@@ -22,7 +22,7 @@ services:
     container_name: quotes_nginx_prod
     restart: unless-stopped
     depends_on:
-      - app
+      - quotes_app
     networks:
       - net
 
