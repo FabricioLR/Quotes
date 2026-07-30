@@ -1,6 +1,6 @@
 {
-  "name": "MyWebSite",
-  "short_name": "MySite",
+  "name": "citacoes.online",
+  "short_name": "C.online",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
