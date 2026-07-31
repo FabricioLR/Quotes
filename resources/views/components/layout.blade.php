@@ -1,5 +1,6 @@
 @props([
-    'title' => 'C.online — palavras que ficam'
+    'title' => 'C.online — palavras que ficam',
+    'description' => 'Um arquivo tranquilo de citações em português — pensado para se ler como um livro, sem ruído e sem pressa.'
 ])
 
 <!DOCTYPE html>
@@ -14,32 +15,36 @@
     <link rel="manifest" href="/site.webmanifest" />
     <title>{{ $title }}</title>
 
+    <meta name="description" content="{{ $description }}">
+    <link rel="canonical" href="{{ url()->current() }}" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="{{ $title }}" />
+    <meta property="og:description" content="{{ $description }}" />
+    <meta property="og:url" content="{{ url()->current() }}" />
+    <meta property="og:site_name" content="citacoes.online" />
+
+    <script type="application/ld+json">
+        {
+        "@@context": "https://schema.org",
+        "@@type": "WebSite",
+        "name": "citacoes.online",
+        "url": "{{ config('app.url') }}",
+        "description": "Arquivo de citações em português."
+        }
+    </script>
+
+    <style>
+        html {
+            scrollbar-gutter: stable;
+        }
+    </style>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..700;1,400..700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        cream: '#FAF8F5',
-                        brand: {
-                            dark: '#1C1917',
-                            muted: '#8A827A',
-                            accent: '#796144',
-                            border: '#E8E2D9',
-                        }
-                    },
-                    fontFamily: {
-                        serif: ['Playfair Display', 'Georgia', 'serif'],
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-cream text-brand-dark font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-brand-accent selection:text-white">
 
