@@ -3,19 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Services\QuoteService;
+use App\Services\CategoryService;
 use Illuminate\Contracts\View\View;
 
 class HomeController extends Controller
 {
     public function __construct(
-        protected QuoteService $quoteService
+        protected QuoteService $quoteService,
+        protected CategoryService $categoryService
     ) {}
 
     public function index(): View
     {
         $featuredQuote = $this->quoteService->getQuoteOfTheDay();
 
-        $categories = $this->quoteService->getFeaturedCategories(limit: 6);
+        $categories = $this->categoryService->getFeaturedCategories(limit: 6);
 
         $recentQuotes = $this->quoteService->getRecentQuotes(
             limit: 6, 

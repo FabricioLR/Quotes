@@ -4,6 +4,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\PanelController;
 use App\Http\Controllers\SearchController;
 use App\Models\Author;
 use App\Models\Quote;
@@ -37,4 +38,25 @@ Route::middleware('guest')->prefix('admin')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])
         ->middleware('throttle:login')
         ->name('admin.login.submit');
+});
+
+Route::middleware(['auth'])->prefix('admin')->as('admin.')->group(function () {
+    Route::get('/dashboard', [PanelController::class, 'index'])->name('dashboard');
+    Route::get('/panel', [PanelController::class, 'index'])->name('panel');
+
+    Route::post('/quotes', [PanelController::class, 'storeQuote'])->name('quotes.store');
+    Route::put('/quotes/{quote}', [PanelController::class, 'updateQuote'])->name('quotes.update');
+    Route::delete('/quotes/{quote}', [PanelController::class, 'destroyQuote'])->name('quotes.destroy');
+
+    Route::post('/authors', [PanelController::class, 'storeAuthor'])->name('authors.store');
+    Route::put('/authors/{author}', [PanelController::class, 'updateAuthor'])->name('authors.update');
+    Route::delete('/authors/{author}', [PanelController::class, 'destroyAuthor'])->name('authors.destroy');
+
+    Route::post('/categories', [PanelController::class, 'storeCategory'])->name('categories.store');
+    Route::put('/categories/{category}', [PanelController::class, 'updateCategory'])->name('categories.update');
+    Route::delete('/categories/{category}', [PanelController::class, 'destroyCategory'])->name('categories.destroy');
+
+    Route::post('/quotes/bulk', [PanelController::class, 'bulkStore'])->name('quotes.bulk');
+
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

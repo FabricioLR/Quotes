@@ -23,17 +23,6 @@ class QuoteService
         return Quote::with(['author', 'categories'])->find($quoteId);
     }
 
-    public function getFeaturedCategories(int $limit = 6)
-    {
-        return Cache::remember("featured_categories_{$limit}", now()->addHours(12), function () use ($limit) {
-            return Category::whereHas('quotes')
-                ->withCount('quotes')
-                ->orderByDesc('quotes_count')
-                ->take($limit)
-                ->get();
-        });
-    }
-
     public function getRecentQuotes(int $limit = 6, ?int $excludeQuoteId = null)
     {
         $cacheKey = "recent_quotes_{$limit}_ex_" . ($excludeQuoteId ?? 'none');
@@ -47,46 +36,101 @@ class QuoteService
         });
     }
 
-    public function getAllCategories()
+    public function createQuote(array $data): Quote
     {
-        return Cache::remember('all_categories_list', now()->addHours(12), function () {
-            return Category::whereHas('quotes')
-                ->withCount('quotes')
-                ->orderBy('name')
-                ->get();
+        $quote = Quote::create([
+            'content' => $data['content'],
+            'author_id' => $data['author_id'],
+            'slug' => Str::slug(Str::limit($data['content'], 40, '')),
+        ]);
+
+        if (!empty($data['category_ids'])) {
+            $quote->categories()->sync($data['category_ids']);
+        }
+
+        return $quote;
+    }
+
+    public function updateQuote(Quote $quote, array $data): Quote
+    {
+        $quote->update([
+            'content' => $data['content'],
+            'author_id' => $data['author_id'],
+        ]);
+
+        if (isset($data['category_ids'])) {
+            $quote->categories()->sync($data['category_ids']);
+        }
+
+        return $quote;
+    }
+
+    public function deleteQuote(Quote $quote): void
+    {
+        $quote->categories()->detach();
+        $quote->delete();
+    }
+
+    public function importFromJsonFile(UploadedFile $file): int
+    {
+        $content = file_get_contents($file->getRealPath());
+        $items = json_decode($content, true);
+
+        if (!is_array($items)) {
+            throw new InvalidArgumentException('O ficheiro não contém um JSON válido ou formatado como array.');
+        }
+
+        return $this->importArray($items);
+    }
+
+    public function importArray(array $items): int
+    {
+        $importedCount = 0;
+
+        DB::transaction(function () use ($items, &$importedCount) {
+            foreach ($items as $item) {
+                $quoteText = $item['quote'] ?? $item['content'] ?? null;
+                if (!$quoteText) {
+                    continue;
+                }
+
+                $authorName = trim($item['author'] ?? 'Desconhecido');
+                $author = Author::firstOrCreate(
+                    ['slug' => Str::slug($authorName)],
+                    ['name' => $authorName]
+                );
+
+                $quote = Quote::create([
+                    'content' => trim($quoteText),
+                    'author_id' => $author->id,
+                    'slug' => Str::slug(Str::limit($quoteText, 40, '')),
+                ]);
+
+                $categoriesInput = $item['category'] ?? $item['categories'] ?? [];
+                if (is_string($categoriesInput)) {
+                    $categoriesInput = array_map('trim', explode(',', $categoriesInput));
+                }
+
+                $categoryIds = [];
+                foreach ((array) $categoriesInput as $catName) {
+                    $catName = trim($catName);
+                    if ($catName) {
+                        $category = Category::firstOrCreate(
+                            ['slug' => Str::slug($catName)],
+                            ['name' => $catName]
+                        );
+                        $categoryIds[] = $category->id;
+                    }
+                }
+
+                if (!empty($categoryIds)) {
+                    $quote->categories()->sync($categoryIds);
+                }
+
+                $importedCount++;
+            }
         });
-    }
-    public function getCategoryBySlug(string $slug, int $perPage = 10): array
-    {
-        $category = Category::where('slug', $slug)->firstOrFail();
 
-        $quotes = Quote::with(['author', 'categories'])
-            ->whereHas('categories', fn($q) => $q->where('categories.id', $category->id))
-            ->latest()
-            ->paginate($perPage);
-
-        return [$category, $quotes];
-    }
-
-    public function getAllAuthors()
-    {
-        return Cache::remember('all_authors_list', now()->addHours(12), function () {
-            return Author::whereHas('quotes')
-                ->withCount('quotes')
-                ->orderBy('name')
-                ->get();
-        });
-    }
-    
-    public function getAuthorBySlug(string $slug, int $perPage = 10): array
-    {
-        $author = Author::where('slug', $slug)->firstOrFail();
-
-        $quotes = Quote::with(['author', 'categories'])
-            ->where('author_id', $author->id)
-            ->latest()
-            ->paginate($perPage);
-
-        return [$author, $quotes];
+        return $importedCount;
     }
 }

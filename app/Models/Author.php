@@ -13,6 +13,16 @@ class Author extends Model
 
     protected $fillable = ['name', 'slug', 'bio', 'avatar_path'];
 
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($author) {
+            if (empty($author->slug)) {
+                $author->slug = Str::slug($author->name);
+            }
+        });
+    }
+
     public function quotes(): HasMany
     {
         return $this->hasMany(Quote::class);
