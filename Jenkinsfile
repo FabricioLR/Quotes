@@ -13,7 +13,10 @@ pipeline {
                     string(credentialsId: 'quotes_app_key', variable: 'APP_KEY'),
                     string(credentialsId: 'quotes_db_password', variable: 'DB_PASSWORD'),
                     string(credentialsId: 'quotes_db_username', variable: 'DB_USERNAME'),
-                    string(credentialsId: 'quotes_db_database', variable: 'DB_DATABASE')
+                    string(credentialsId: 'quotes_db_database', variable: 'DB_DATABASE'),
+                    string(credentialsId: 'quotes_default_admin_password', variable: 'DEFAULT_ADMIN_PASSWORD'),
+                    string(credentialsId: 'quotes_default_admin_email', variable: 'DEFAULT_ADMIN_EMAIL'),
+                    string(credentialsId: 'quotes_default_admin_name', variable: 'DEFAULT_ADMIN_NAME')
                 ]) {
                     sh """
                     echo "APP_NAME=Quotes" > .env.prod
@@ -35,6 +38,9 @@ pipeline {
                     echo "CACHE_DRIVER=file" >> .env.prod
                     echo "QUEUE_CONNECTION=file" >> .env.prod
                     echo "VITE_APP_NAME=Quotes" >> .env.prod
+                    echo "DEFAULT_ADMIN_PASSWORD=${DEFAULT_ADMIN_PASSWORD}" >> .env.prod
+                    echo "DEFAULT_ADMIN_EMAIL=${DEFAULT_ADMIN_EMAIL}" >> .env.prod
+                    echo "DEFAULT_ADMIN_NAME=${DEFAULT_ADMIN_NAME}" >> .env.prod
                     """
                     sh 'docker compose -f docker-compose.prod.yaml build'
                 }
@@ -50,7 +56,6 @@ pipeline {
     
     post {
         always {
-            sh 'docker compose -p test -f docker-compose.test.yaml down || true'
             cleanWs()
         }
     }
