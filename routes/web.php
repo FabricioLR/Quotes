@@ -3,6 +3,7 @@
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\SearchController;
 use App\Models\Author;
 use App\Models\Quote;
@@ -20,7 +21,6 @@ Route::get('/autor/{author:slug}', [AuthorController::class, 'show'])->name('aut
 Route::get('/pesquisar', SearchController::class)->name('search');
 
 Route::get('/sobre', function () {
-    // Cache counts for 12 hours to keep page loads fast
     $stats = Cache::remember('about_page_stats', now()->addHours(12), function () {
         return [
             'quotes_count'  => Quote::count(),
@@ -30,3 +30,11 @@ Route::get('/sobre', function () {
 
     return view('about', $stats);
 })->name('about');
+
+
+Route::middleware('guest')->prefix('admin')->group(function () {
+    Route::get('/login', [AuthController::class, 'index'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])
+        ->middleware('throttle:login')
+        ->name('admin.login.submit');
+});
