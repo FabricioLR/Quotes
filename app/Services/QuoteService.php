@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
 use InvalidArgumentException;
+use Illuminate\Database\Eloquent\Collection;
 class QuoteService
 {
     public function getQuoteOfTheDay(): ?Quote
@@ -38,6 +39,35 @@ class QuoteService
                 ->take($limit)
                 ->get();
         });
+    }
+
+    public function getQuoteWithRelated(Quote $quote, int $limit = 5): array
+    {
+        $quote->loadMissing(['author', 'categories']);
+
+        $categoryIds = $quote->categories->pluck('id');
+
+        $relatedQuotes = Quote::query()
+            ->with(['author', 'categories'])
+            ->where('id', '!=', $quote->id)
+            ->where(function ($query) use ($quote, $categoryIds) {
+                $query->where('author_id', $quote->author_id);
+                
+                if ($categoryIds->isNotEmpty()) {
+                    $query->orWhereHas('categories', function ($q) use ($categoryIds) {
+                        $q->whereIn('categories.id', $categoryIds);
+                    });
+                }
+            })
+            ->orderByRaw('author_id = ? DESC', [$quote->author_id])
+            ->latest()
+            ->take($limit)
+            ->get();
+
+        return [
+            'quote' => $quote,
+            'relatedQuotes' => $relatedQuotes,
+        ];
     }
 
     public function createQuote(array $data): Quote

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\QuoteService;
 use App\Models\Quote;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
 class QuoteController extends Controller
@@ -12,6 +13,12 @@ class QuoteController extends Controller
     public function __construct(
         protected QuoteService $quoteService,
     ) {}
+    public function show(Quote $quote): View
+    {
+        $data = $this->quoteService->getQuoteWithRelated($quote);
+
+        return view('quotes.show', $data);
+    }
     public function storeQuote(Request $request): RedirectResponse
     {
         $validated = $request->validate([

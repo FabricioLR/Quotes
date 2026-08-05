@@ -9,7 +9,9 @@
                 <span class="font-serif text-5xl text-brand-muted/40 block -mb-6 select-none">“</span>
                 
                 <blockquote class="font-serif text-[34px] leading-[1.25] text-brand-dark max-w-2xl">
-                    {{ $featuredQuote->content }}
+                    <a href="{{ route('quotes.show', $featuredQuote->slug) }}" class="hover:text-brand-accent transition-colors">
+                        {{ $featuredQuote->content }}
+                    </a>
                 </blockquote>
 
                 <div class="mt-5 text-xs text-brand-muted tracking-wide flex items-center gap-1.5">
@@ -29,10 +31,10 @@
 
                 <div class="mt-7 flex items-center gap-2.5">
                     <button onclick="copyToClipboard(@js($featuredQuote->content))" 
-                            class="px-5 py-2 text-xs font-normal text-brand-dark bg-transparent border border-brand-border/90 rounded-[2px] hover:bg-brand-badge transition-colors">
+                            class="hover:border-brand-accent/60 cursor-pointer px-5 py-2 text-xs font-normal text-brand-dark bg-transparent border border-brand-border/90 rounded-[2px] hover:bg-brand-badge transition-colors">
                         Copiar
                     </button>
-                    <button class="px-5 py-2 text-xs font-normal text-white bg-brand-accent rounded-[2px] hover:opacity-90 transition-opacity">
+                    <button class="cursor-pointer px-5 py-2 text-xs font-normal text-white bg-brand-accent rounded-[2px] hover:opacity-90 transition-opacity">
                         Partilhar
                     </button>
                 </div>
@@ -69,7 +71,9 @@
             @forelse($recentQuotes as $quote)
                 <article class="py-7">
                     <blockquote class="font-serif text-[21px] text-brand-dark leading-snug">
-                        “{{ $quote->content }}”
+                        <a href="{{ route('quotes.show', $quote->slug) }}" class="hover:text-brand-accent transition-colors">
+                            “{{ $quote->content }}”
+                        </a>
                     </blockquote>
 
                     <div class="mt-2.5 text-xs text-brand-muted flex items-center gap-1.5">
