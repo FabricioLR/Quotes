@@ -2,10 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\QuoteService;
+use App\Models\Quote;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class QuoteController extends Controller
 {
+    public function __construct(
+        protected QuoteService $quoteService,
+    ) {}
     public function storeQuote(Request $request): RedirectResponse
     {
         $validated = $request->validate([
@@ -15,7 +21,7 @@ class QuoteController extends Controller
             'category_ids.*' => ['exists:categories,id'],
         ]);
 
-        $this->panelService->createQuote($validated);
+        $this->quoteService->createQuote($validated);
         return redirect()->route('admin.panel', ['tab' => 'quotes'])->with('success', 'Citação criada.');
     }
 
@@ -28,13 +34,13 @@ class QuoteController extends Controller
             'category_ids.*' => ['exists:categories,id'],
         ]);
 
-        $this->panelService->updateQuote($quote, $validated);
+        $this->quoteService->updateQuote($quote, $validated);
         return redirect()->route('admin.panel', ['tab' => 'quotes'])->with('success', 'Citação atualizada.');
     }
 
     public function destroyQuote(Quote $quote): RedirectResponse
     {
-        $this->panelService->deleteQuote($quote);
+        $this->quoteService->deleteQuote($quote);
         return redirect()->route('admin.panel', ['tab' => 'quotes'])->with('success', 'Citação eliminada.');
     }
 }

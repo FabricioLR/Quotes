@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Category;
 use App\Models\Quote;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 class CategoryService
 {

@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Author;
 use App\Models\Quote;
-
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
 
 class AuthorService

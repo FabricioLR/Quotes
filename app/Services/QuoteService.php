@@ -4,8 +4,12 @@ namespace App\Services;
 
 use App\Models\Category;
 use App\Models\Quote;
+use App\Models\Author;
 use Illuminate\Support\Facades\Cache;
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Http\UploadedFile;
+use InvalidArgumentException;
 class QuoteService
 {
     public function getQuoteOfTheDay(): ?Quote
@@ -100,11 +104,14 @@ class QuoteService
                     ['name' => $authorName]
                 );
 
-                $quote = Quote::create([
-                    'content' => trim($quoteText),
-                    'author_id' => $author->id,
-                    'slug' => Str::slug(Str::limit($quoteText, 40, '')),
-                ]);
+                $quote = Quote::firstOrCreate(
+                    ['slug' => Str::slug(Str::limit($quoteText, 40, ''))],
+                    [
+                        'content' => trim($quoteText),
+                        'author_id' => $author->id,
+                        'slug' => Str::slug(Str::limit($quoteText, 40, ''))
+                    ]
+                );
 
                 $categoriesInput = $item['category'] ?? $item['categories'] ?? [];
                 if (is_string($categoriesInput)) {

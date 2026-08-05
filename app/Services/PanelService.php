@@ -6,7 +6,6 @@ use App\Models\Quote;
 use App\Models\Author;
 use App\Models\Category;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 
 class PanelService
 {

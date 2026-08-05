@@ -11,12 +11,10 @@ use InvalidArgumentException;
 
 class PanelController extends Controller
 {
-    protected PanelService $panelService;
-
-    public function __construct(PanelService $panelService)
-    {
-        $this->panelService = $panelService;
-    }
+    public function __construct(
+        protected PanelService $panelService,
+        protected QuoteService $quoteService
+    ) {}
 
     public function index(Request $request): View
     {
