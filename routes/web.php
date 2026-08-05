@@ -11,6 +11,8 @@ use App\Models\Author;
 use App\Models\Quote;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\File;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -60,4 +62,19 @@ Route::middleware(['auth'])->prefix('admin')->as('admin.')->group(function () {
     Route::post('/quotes/bulk', [PanelController::class, 'bulkStore'])->name('quotes.bulk');
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+});
+
+Route::get('/sitemap.xml', function () {
+    $path = storage_path('app/sitemap.xml');
+
+    if (!File::exists($path)) {
+        abort(404, 'Sitemap not yet generated.');
+    }
+
+    $content = File::get($path);
+
+    return Response::make($content, 200, [
+        'Content-Type' => 'text/xml',
+        'Cache-Control' => 'public, max-age=3600',
+    ]);
 });

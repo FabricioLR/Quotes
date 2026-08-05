@@ -50,7 +50,7 @@ pipeline {
             steps {
                 sh 'docker compose -f docker-compose.prod.yaml down'
                 sh 'docker compose -f docker-compose.prod.yaml up -d'
-                sh 'docker compose -f docker-compose.prod.yaml quotes_app php artisan optimize'
+                sh 'docker compose -f docker-compose.prod.yaml exec -it quotes_app php artisan optimize'
             }
         }
     }
