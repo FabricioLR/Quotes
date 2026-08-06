@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Category;
 use App\Models\Quote;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class CategoryService
@@ -26,6 +27,8 @@ class CategoryService
             ->whereHas('categories', fn($q) => $q->where('categories.id', $category->id))
             ->latest()
             ->paginate($perPage);
+
+        Log::debug("Fetched category: {$category->name} with {$quotes->total()} quotes.");
 
         return [$category, $quotes];
     }

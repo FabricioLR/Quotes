@@ -47,7 +47,9 @@
             @forelse($quotes as $quote)
                 <article class="py-7">
                     <blockquote class="font-serif text-[21px] text-brand-dark leading-snug">
-                        “{{ $quote->content }}”
+                        <a href="{{ route('quotes.show', $quote->slug) }}" class="hover:text-brand-accent transition-colors">
+                            “{{ $quote->content }}”
+                        </a>
                     </blockquote>
 
                     <div class="mt-2.5 text-xs text-brand-muted flex items-center gap-1.5">

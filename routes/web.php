@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\File;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/categoria/{quote:slug}', [QuoteController::class, 'show'])->name('quotes.show');
+Route::get('/citacao/{quote:slug}', [QuoteController::class, 'show'])->name('quotes.show');
 
 Route::get('/categorias', [CategoryController::class, 'index'])->name('categories.index');
 Route::get('/categoria/{category:slug}', [CategoryController::class, 'show'])->name('categories.show');

@@ -30,8 +30,11 @@
                 </div>
 
                 <div class="mt-7 flex items-center gap-2.5">
-                    <button onclick="copyToClipboard(@js($featuredQuote->content))" 
-                            class="hover:border-brand-accent/60 cursor-pointer px-5 py-2 text-xs font-normal text-brand-dark bg-transparent border border-brand-border/90 rounded-[2px] hover:bg-brand-badge transition-colors">
+                    <button 
+                        type="button"
+                        onclick="copyAndFeedback(this, @js($featuredQuote->content) + ' - ' + @js($featuredQuote->author->name))"
+                        class="hover:border-brand-accent/60 cursor-pointer px-5 py-2 text-xs font-normal text-brand-dark bg-transparent border border-brand-border/90 rounded-[2px] hover:bg-brand-badge transition-all min-w-[80px]"
+                    >
                         Copiar
                     </button>
                     <button class="cursor-pointer px-5 py-2 text-xs font-normal text-white bg-brand-accent rounded-[2px] hover:opacity-90 transition-opacity">
@@ -96,4 +99,36 @@
             @endforelse
         </div>
     </section>
+    <script>
+        async function copyAndFeedback(button, text) {
+            if (!text) return;
+
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(text);
+                } else {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = text;
+                    textarea.style.position = 'fixed';
+                    textarea.style.opacity = '0';
+                    document.body.appendChild(textarea);
+                    textarea.focus();
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                }
+
+                const originalText = button.textContent;
+                button.textContent = 'Copiado!';
+                button.classList.add('font-medium');
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('font-medium');
+                }, 2000);
+
+            } catch (err) {
+                console.error('Failed to copy: ', err);
+            }
+        }
+    </script>
 </x-layout>

@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Author;
 use App\Models\Category;
+use App\Models\Quote;
 use Illuminate\Console\Command;
 use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\Tags\Url;
@@ -56,6 +57,15 @@ class GenerateSitemap extends Command
                 Url::create(route('categories.show', $category->slug))
                     ->setPriority(0.7)
                     ->setLastModificationDate($category->updated_at)
+                    ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
+            );
+        });
+
+        Quote::cursor()->each(function (Quote $quote) use ($sitemap) {
+            $sitemap->add(
+                Url::create(route('quotes.show', $quote->slug))
+                    ->setPriority(0.7)
+                    ->setLastModificationDate($quote->updated_at)
                     ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
             );
         });
